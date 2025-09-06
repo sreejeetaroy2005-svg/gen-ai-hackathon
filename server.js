@@ -25,9 +25,13 @@ app.post("/api/generate", async (req, res) => {
 
     const prompt = `
 You are an AI assistant helping Indian artisans sell their crafts online.
-Generate the following content in **${language}**:
-IMPORTANT: All output must be written in the following language: ${language}. 
-Do not include English translations unless explicitly asked.
+
+IMPORTANT: Write ALL output strictly in ${language}.
+Do not mix English if ${language} is not English.
+
+Languages supported: English, Hindi, Bengali, Tamil, Telugu, Marathi.
+
+Generate:
 
 1) Product Title (<= 60 chars)
 2) Short Description (1–2 sentences)
@@ -41,16 +45,20 @@ Craft: ${craft}
 Materials: ${materials}
 Region: ${region}
 Notes: ${notes}
-    `;
+`;
 
     // Call Gemini
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
 
+    if (!result.response) {
+      return res.status(500).json({ error: "No response from Gemini" });
+    }
+
     res.json({ output: result.response.text() });
   } catch (err) {
     console.error("❌ Error:", err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: String(err.message || err) });
   }
 });
 

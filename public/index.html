@@ -7,7 +7,7 @@
     body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
     h1 { color: #333; }
     form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-    input, textarea { width: 100%; margin: 8px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    input, textarea, select { width: 100%; margin: 8px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
     button { background: #4CAF50; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; }
     button:hover { background: #45a049; }
     #output { margin-top: 20px; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 8px; white-space: pre-wrap; }
@@ -21,14 +21,16 @@
     <input placeholder="Materials" id="materials" required />
     <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" required />
     <textarea placeholder="Extra Notes" id="notes"></textarea>
+
+    <label for="language">Output Language:</label>
     <select id="language">
-  <option value="English" selected>English</option>
-  <option value="Hindi">Hindi</option>
-  <option value="Bengali">Bengali</option>
-  <option value="Tamil">Tamil</option>
-  <option value="Telugu">Telugu</option>
-  <option value="Marathi">Marathi</option>
-</select>
+      <option value="English" selected>English</option>
+      <option value="Hindi">Hindi</option>
+      <option value="Bengali">Bengali</option>
+      <option value="Tamil">Tamil</option>
+      <option value="Telugu">Telugu</option>
+      <option value="Marathi">Marathi</option>
+    </select>
 
     <button type="submit">✨ Generate Content</button>
   </form>
@@ -42,7 +44,7 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      output.textContent = "Generating...";
+      output.textContent = "⏳ Generating...";
 
       const body = {
         title: document.getElementById("title").value,
@@ -50,6 +52,7 @@
         materials: document.getElementById("materials").value,
         region: document.getElementById("region").value,
         notes: document.getElementById("notes").value,
+        language: document.getElementById("language").value,
       };
 
       try {
@@ -58,10 +61,23 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
-        const data = await resp.json();
-        output.textContent = data.output || data.error;
+
+        if (!resp.ok) {
+          const text = await resp.text();
+          output.textContent = "❌ Server error: " + text;
+          return;
+        }
+
+        let data;
+        try {
+          data = await resp.json();
+          output.textContent = data.output || data.error;
+        } catch (err) {
+          const raw = await resp.text();
+          output.textContent = "⚠️ Could not parse JSON.\nRaw output:\n" + raw;
+        }
       } catch (err) {
-        output.textContent = "❌ Error: " + err.message;
+        output.textContent = "❌ Network error: " + err.message;
       }
     });
   </script>
