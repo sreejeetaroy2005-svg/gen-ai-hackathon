@@ -1,30 +1,17 @@
 {
-  "name": "gen-ai-hackathon",
+  "name": "vertex-gemini-starter",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node index.js",
+    "start": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sreejeetaroy2005-svg/gen-ai-hackathon.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/sreejeetaroy2005-svg/gen-ai-hackathon/issues"
-  },
-  "homepage": "https://github.com/sreejeetaroy2005-svg/gen-ai-hackathon#readme",
   "dependencies": {
-    "@google-cloud/storage": "^7.17.0",
-    "@google-cloud/translate": "^9.2.0",
-    "@google-cloud/vertexai": "^1.10.0",
-    "@google-cloud/vision": "^5.3.3",
+    "@google-cloud/vertexai": "^1.5.0",
+    "@google/generative-ai": "^0.24.1",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "firebase-admin": "^13.5.0"
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2"
   }
 }

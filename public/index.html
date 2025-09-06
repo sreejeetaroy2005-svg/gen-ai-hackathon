@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AI Marketplace Assistant</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+    h1 { color: #333; }
+    form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; margin: 8px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #4CAF50; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    #output { margin-top: 20px; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 8px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>AI Marketplace Assistant</h1>
+  <form id="form">
+    <input placeholder="Product Title" id="title" required />
+    <input placeholder="Craft (e.g., weaving, pottery)" id="craft" required />
+    <input placeholder="Materials" id="materials" required />
+    <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" required />
+    <textarea placeholder="Extra Notes" id="notes"></textarea>
+    <select id="language">
+  <option value="English" selected>English</option>
+  <option value="Hindi">Hindi</option>
+  <option value="Bengali">Bengali</option>
+  <option value="Tamil">Tamil</option>
+  <option value="Telugu">Telugu</option>
+  <option value="Marathi">Marathi</option>
+</select>
+
+    <button type="submit">✨ Generate Content</button>
+  </form>
+
+  <h2>AI Output:</h2>
+  <div id="output"></div>
+
+  <script>
+    const form = document.getElementById("form");
+    const output = document.getElementById("output");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      output.textContent = "Generating...";
+
+      const body = {
+        title: document.getElementById("title").value,
+        craft: document.getElementById("craft").value,
+        materials: document.getElementById("materials").value,
+        region: document.getElementById("region").value,
+        notes: document.getElementById("notes").value,
+      };
+
+      try {
+        const resp = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+        output.textContent = data.output || data.error;
+      } catch (err) {
+        output.textContent = "❌ Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
