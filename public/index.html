@@ -3,83 +3,140 @@
 <head>
   <meta charset="utf-8" />
   <title>AI Marketplace Assistant</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
-    h1 { color: #333; }
-    form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-    input, textarea, select { width: 100%; margin: 8px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-    button { background: #4CAF50; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #45a049; }
-    #output { margin-top: 20px; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 8px; white-space: pre-wrap; }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>AI Marketplace Assistant</h1>
-  <form id="form">
-    <input placeholder="Product Title" id="title" required />
-    <input placeholder="Craft (e.g., weaving, pottery)" id="craft" required />
-    <input placeholder="Materials" id="materials" required />
-    <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" required />
-    <textarea placeholder="Extra Notes" id="notes"></textarea>
+  <div class="container">
+    <h1>✨ AI Marketplace Assistant</h1>
+    <form id="form" enctype="multipart/form-data">
+      <input placeholder="Product Title" id="title" name="title" />
+<input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
+<input placeholder="Materials" id="materials" name="materials" />
+<input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
+<textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
 
-    <label for="language">Output Language:</label>
-    <select id="language">
-      <option value="English" selected>English</option>
-      <option value="Hindi">Hindi</option>
-      <option value="Bengali">Bengali</option>
-      <option value="Tamil">Tamil</option>
-      <option value="Telugu">Telugu</option>
-      <option value="Marathi">Marathi</option>
-    </select>
 
-    <button type="submit">✨ Generate Content</button>
-  </form>
+      <label for="language">Output Language:</label>
+      <select id="language" name="language">
+        <option value="English" selected>English</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Bengali">Bengali</option>
+        <option value="Tamil">Tamil</option>
+        <option value="Telugu">Telugu</option>
+        <option value="Marathi">Marathi</option>
+      </select>
 
-  <h2>AI Output:</h2>
-  <div id="output"></div>
+      <label for="image">Upload Product Image:</label>
+      <input type="file" id="image" name="image" accept="image/*" />
+
+      <img id="preview" style="max-width:200px; margin-top:10px; display:none;" />
+      <p id="image-status" style="display:none; color: #007bff; font-weight: 600;"></p>
+
+      <button type="submit">🚀 Generate Content</button>
+    </form>
+
+    <h2>AI Output:</h2>
+    <div id="output-box"></div>
+    <button id="copy-btn" class="copy-btn" style="display:none;">📋 Copy to Clipboard</button>
+  </div>
 
   <script>
     const form = document.getElementById("form");
-    const output = document.getElementById("output");
+    const outputBox = document.getElementById("output-box");
+    const imageInput = document.getElementById("image");
+    const preview = document.getElementById("preview");
+    const copyBtn = document.getElementById("copy-btn");
+    const imageStatus = document.getElementById("image-status");
 
+    // Preview uploaded image + show status
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+          imageStatus.textContent = "🖼️ Image will be analyzed by AI";
+          imageStatus.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = "none";
+        imageStatus.style.display = "none";
+      }
+    });
+
+    // Submit form
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      output.textContent = "⏳ Generating...";
+      outputBox.textContent = "⏳ Generating...";
 
-      const body = {
-        title: document.getElementById("title").value,
-        craft: document.getElementById("craft").value,
-        materials: document.getElementById("materials").value,
-        region: document.getElementById("region").value,
-        notes: document.getElementById("notes").value,
-        language: document.getElementById("language").value,
-      };
+      const formData = new FormData();
+      formData.append("title", document.getElementById("title").value);
+      formData.append("craft", document.getElementById("craft").value);
+      formData.append("materials", document.getElementById("materials").value);
+      formData.append("region", document.getElementById("region").value);
+      formData.append("notes", document.getElementById("notes").value);
+      formData.append("language", document.getElementById("language").value);
+      if (imageInput.files[0]) {
+        formData.append("image", imageInput.files[0]);
+      }
 
       try {
         const resp = await fetch("/api/generate", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          body: formData,
         });
 
         if (!resp.ok) {
           const text = await resp.text();
-          output.textContent = "❌ Server error: " + text;
+          outputBox.textContent = "❌ Server error: " + text;
           return;
         }
 
         let data;
         try {
           data = await resp.json();
-          output.textContent = data.output || data.error;
+          outputBox.textContent = data.output || data.error;
         } catch (err) {
           const raw = await resp.text();
-          output.textContent = "⚠️ Could not parse JSON.\nRaw output:\n" + raw;
+          outputBox.textContent = "⚠️ Could not parse JSON.\nRaw output:\n" + raw;
         }
+
+        // Show copy button if we have output
+        copyBtn.style.display = "inline-block";
       } catch (err) {
-        output.textContent = "❌ Network error: " + err.message;
+        outputBox.textContent = "❌ Network error: " + err.message;
       }
     });
+
+    // Copy to clipboard
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(outputBox.textContent).then(() => {
+        copyBtn.textContent = "✅ Copied!";
+        setTimeout(() => (copyBtn.textContent = "📋 Copy to Clipboard"), 2000);
+      });
+    });
   </script>
+  <div class="slideshow">
+  <img src="bg1.jpg" class="active" />
+  <img src="bg2.jpg" />
+  <img src="bg3.jpg" />
+  <img src="bg4.jpg" />
+  <img src="bg5.jpg" />
+</div>
+
+<script>
+  const slides = document.querySelectorAll(".slideshow img");
+  let index = 0;
+
+  setInterval(() => {
+    slides[index].classList.remove("active");
+    index = (index + 1) % slides.length;
+    slides[index].classList.add("active");
+  }, 5000); // change every 5s
+</script>
+
 </body>
 </html>
+

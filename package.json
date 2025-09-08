@@ -4,14 +4,19 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node index.js",
-    "start": "node index.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "dependencies": {
-    "@google-cloud/vertexai": "^1.5.0",
+    "@google-cloud/vision": "^5.3.3",
     "@google/generative-ai": "^0.24.1",
+    "axios": "^1.11.0",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
