@@ -4,17 +4,155 @@
   <meta charset="utf-8" />
   <title>AI Marketplace Assistant</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* Heading font: classic, elegant serif */
+    h1 {
+      font-family: 'Georgia', 'Times New Roman', Times, serif;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Subheadings */
+    h2 {
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+      font-weight: normal;
+      text-align: center;
+    }
+
+    /* Body, inputs, textarea, select, buttons */
+    body, input, textarea, select, button {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: normal;
+    }
+
+    /* Optional accent font */
+    .button, h3 {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* Story Cards */
+    .story-list {
+      padding: 30px;
+      background: #fafafa;
+    }
+
+    #storyContainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .story-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      width: 220px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .story-card:hover {
+      transform: scale(1.05);
+    }
+
+    .story-card img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background: #fff;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    .modal-content img {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .close {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .product-grid div {
+      flex: 1 1 45%;
+      text-align: center;
+    }
+
+    .product-grid img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+
+    /* Slideshow */
+    .slideshow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .slideshow img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+
+    .slideshow img.active {
+      opacity: 1;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 <body>
   <div class="container">
-    <h1>✨ AI Marketplace Assistant</h1>
+    <h1>Heritage Hands</h1>
+    <h2>Celebrating Crafts; Connecting Artisans</h2>
     <form id="form" enctype="multipart/form-data">
       <input placeholder="Product Title" id="title" name="title" />
-<input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
-<input placeholder="Materials" id="materials" name="materials" />
-<input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
-<textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
-
+      <input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
+      <input placeholder="Materials" id="materials" name="materials" />
+      <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
+      <textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
 
       <label for="language">Output Language:</label>
       <select id="language" name="language">
@@ -28,7 +166,6 @@
 
       <label for="image">Upload Product Image:</label>
       <input type="file" id="image" name="image" accept="image/*" />
-
       <img id="preview" style="max-width:200px; margin-top:10px; display:none;" />
       <p id="image-status" style="display:none; color: #007bff; font-weight: 600;"></p>
 
@@ -37,7 +174,40 @@
 
     <h2>AI Output:</h2>
     <div id="output-box"></div>
-    <button id="copy-btn" class="copy-btn" style="display:none;">📋 Copy to Clipboard</button>
+
+    <div class="actions">
+      <button id="copy-btn" class="copy-btn" style="display:none;">📋 Copy</button>
+      <button id="whatsapp-btn" class="wa-btn" style="display:none;">📲 WhatsApp</button>
+      <button id="pdf-btn" class="pdf-btn" style="display:none;">📄 Download PDF</button>
+    </div>
+  </div>
+
+  <!-- Background Slideshow -->
+  <div class="slideshow">
+    <img src="bg1.jpg" class="active" />
+    <img src="bg2.jpg" />
+    <img src="bg3.jpg" />
+    <img src="bg4.jpg" />
+    <img src="bg5.jpg" />
+  </div>
+
+  <!-- Artisan Stories Section -->
+  <section class="story-list">
+    <h2>Stories of Our Artisans</h2>
+    <div id="storyContainer"></div>
+  </section>
+
+  <!-- Modal -->
+  <div id="storyModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modalName"></h3>
+      <img id="modalImage" src="" alt="">
+      <p id="modalStory"></p>
+      <h4>Products:</h4>
+      <div id="modalProducts" class="product-grid"></div>
+      <p id="modalRegion"></p>
+    </div>
   </div>
 
   <script>
@@ -45,10 +215,13 @@
     const outputBox = document.getElementById("output-box");
     const imageInput = document.getElementById("image");
     const preview = document.getElementById("preview");
-    const copyBtn = document.getElementById("copy-btn");
     const imageStatus = document.getElementById("image-status");
 
-    // Preview uploaded image + show status
+    const copyBtn = document.getElementById("copy-btn");
+    const whatsappBtn = document.getElementById("whatsapp-btn");
+    const pdfBtn = document.getElementById("pdf-btn");
+
+    // Image preview
     imageInput.addEventListener("change", () => {
       const file = imageInput.files[0];
       if (file) {
@@ -66,22 +239,12 @@
       }
     });
 
-    // Submit form
+    // Form submit
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       outputBox.textContent = "⏳ Generating...";
 
-      const formData = new FormData();
-      formData.append("title", document.getElementById("title").value);
-      formData.append("craft", document.getElementById("craft").value);
-      formData.append("materials", document.getElementById("materials").value);
-      formData.append("region", document.getElementById("region").value);
-      formData.append("notes", document.getElementById("notes").value);
-      formData.append("language", document.getElementById("language").value);
-      if (imageInput.files[0]) {
-        formData.append("image", imageInput.files[0]);
-      }
-
+      const formData = new FormData(form);
       try {
         const resp = await fetch("/api/generate", {
           method: "POST",
@@ -89,54 +252,125 @@
         });
 
         if (!resp.ok) {
-          const text = await resp.text();
-          outputBox.textContent = "❌ Server error: " + text;
+          outputBox.textContent = "❌ Server error: " + (await resp.text());
           return;
         }
 
-        let data;
-        try {
-          data = await resp.json();
-          outputBox.textContent = data.output || data.error;
-        } catch (err) {
-          const raw = await resp.text();
-          outputBox.textContent = "⚠️ Could not parse JSON.\nRaw output:\n" + raw;
-        }
+        const data = await resp.json();
+        outputBox.textContent = data.output || data.error;
 
-        // Show copy button if we have output
-        copyBtn.style.display = "inline-block";
+        if (data.output) {
+          copyBtn.style.display = "inline-block";
+          whatsappBtn.style.display = "inline-block";
+          pdfBtn.style.display = "inline-block";
+        }
       } catch (err) {
         outputBox.textContent = "❌ Network error: " + err.message;
       }
     });
 
-    // Copy to clipboard
+    // Copy
     copyBtn.addEventListener("click", () => {
       navigator.clipboard.writeText(outputBox.textContent).then(() => {
         copyBtn.textContent = "✅ Copied!";
-        setTimeout(() => (copyBtn.textContent = "📋 Copy to Clipboard"), 2000);
+        setTimeout(() => (copyBtn.textContent = "📋 Copy"), 2000);
       });
     });
+
+    // WhatsApp Share
+    whatsappBtn.addEventListener("click", () => {
+      const text = encodeURIComponent(outputBox.textContent);
+      window.open(`https://wa.me/?text=${text}`, "_blank");
+    });
+
+    // PDF Download
+    // PDF Download
+pdfBtn.addEventListener("click", () => {
+  const { jsPDF } = window.jspdf; // get from the global namespace
+  const doc = new jsPDF();
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(12);
+  const text = outputBox.textContent;
+  const lines = doc.splitTextToSize(text, 180);
+  doc.text(lines, 15, 20);
+  doc.save("artisan-product.pdf");
+});
+
+    // Slideshow
+    const slides = document.querySelectorAll(".slideshow img");
+    let index = 0;
+    setInterval(() => {
+      slides[index].classList.remove("active");
+      index = (index + 1) % slides.length;
+      slides[index].classList.add("active");
+    }, 5000);
+
+    // Artisan stories
+    const artisans = [
+      {
+        name: "Ravi Kumar",
+        story: "I learned pottery from my father in Odisha. My work reflects traditional techniques passed down through generations.",
+        products: [
+          {title: "Clay Vase", price: 1200, image: "vase.jpg"},
+          {title: "Decorative Bowl", price: 800, image: "bowl.jpg"}
+        ],
+        region: "Odisha",
+        profileImage: "ravi.png"
+      },
+      {
+        name: "Sita Devi",
+        story: "I create traditional handwoven textiles in Rajasthan. Each piece tells a story of heritage and craftsmanship.",
+        products: [
+          {title: "Handloom Scarf", price: 1500, image: "scarf.jpg"}
+        ],
+        region: "Rajasthan",
+        profileImage: "sita.png"
+      }
+    ];
+
+    const storyContainer = document.getElementById('storyContainer');
+    artisans.forEach((artisan, index) => {
+      const card = document.createElement('div');
+      card.className = 'story-card';
+      card.innerHTML = `
+        <img src="${artisan.profileImage}" alt="${artisan.name}">
+        <h4>${artisan.name}</h4>
+        <p>${artisan.story.substring(0, 100)}...</p>
+        <small>Region: ${artisan.region}</small>
+      `;
+      card.addEventListener('click', () => openModal(index));
+      storyContainer.appendChild(card);
+    });
+
+    const modal = document.getElementById('storyModal');
+    const closeBtn = modal.querySelector('.close');
+    const modalName = document.getElementById('modalName');
+    const modalImage = document.getElementById('modalImage');
+    const modalStory = document.getElementById('modalStory');
+    const modalProducts = document.getElementById('modalProducts');
+    const modalRegion = document.getElementById('modalRegion');
+
+    function openModal(index) {
+      const artisan = artisans[index];
+      modalName.textContent = artisan.name;
+      modalImage.src = artisan.profileImage;
+      modalStory.textContent = artisan.story;
+      modalRegion.textContent = `Region: ${artisan.region}`;
+      modalProducts.innerHTML = '';
+      artisan.products.forEach(prod => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <img src="${prod.image}">
+          <p>${prod.title}</p>
+          <p>₹${prod.price}</p>
+        `;
+        modalProducts.appendChild(div);
+      });
+      modal.style.display = 'block';
+    }
+
+    closeBtn.onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
   </script>
-  <div class="slideshow">
-  <img src="bg1.jpg" class="active" />
-  <img src="bg2.jpg" />
-  <img src="bg3.jpg" />
-  <img src="bg4.jpg" />
-  <img src="bg5.jpg" />
-</div>
-
-<script>
-  const slides = document.querySelectorAll(".slideshow img");
-  let index = 0;
-
-  setInterval(() => {
-    slides[index].classList.remove("active");
-    index = (index + 1) % slides.length;
-    slides[index].classList.add("active");
-  }, 5000); // change every 5s
-</script>
-
 </body>
 </html>
-
