@@ -4,20 +4,21 @@
   <meta charset="utf-8" />
   <title>AI Marketplace Assistant</title>
   <link rel="stylesheet" href="style.css" />
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
 
   <style>
-    /* Heading font: classic, elegant serif */
-    h1 {
-      font-family: 'Georgia', 'Times New Roman', Times, serif;
+    /* Heading font: classic, elegant serif*/ 
+    h1
+    {
       font-weight: bold;
       text-align: center;
-    }
-
-    /* Subheadings */
-    h2 {
-      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-      font-weight: normal;
-      text-align: center;
+      color: beige;
     }
 
     /* Body, inputs, textarea, select, buttons */
@@ -147,13 +148,37 @@
   <div class="container">
     <h1>Heritage Hands</h1>
     <h2>Celebrating Crafts; Connecting Artisans</h2>
-    <form id="form" enctype="multipart/form-data">
-      <input placeholder="Product Title" id="title" name="title" />
-      <input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
-      <input placeholder="Materials" id="materials" name="materials" />
-      <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
-      <textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
+      <form id="form" enctype="multipart/form-data">
+    <div class="input-wrapper">
+  <input placeholder="Product Title" id="title" name="title" />
+  <span class="mic-icon" data-target="title">🎤</span>
+</div>
 
+<div class="input-wrapper">
+  <input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
+  <span class="mic-icon" data-target="craft">🎤</span>
+</div>
+
+<div class="input-wrapper">
+  <input placeholder="Materials" id="materials" name="materials" />
+  <span class="mic-icon" data-target="materials">🎤</span>
+</div>
+
+<div class="input-wrapper">
+  <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
+  <span class="mic-icon" data-target="region">🎤</span>
+</div>
+
+<div class="input-wrapper">
+  <textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
+  <span class="mic-icon" data-target="notes">🎤</span>
+</div>
+
+
+
+
+
+      
       <label for="language">Output Language:</label>
       <select id="language" name="language">
         <option value="English" selected>English</option>
@@ -175,11 +200,19 @@
     <h2>AI Output:</h2>
     <div id="output-box"></div>
 
-    <div class="actions">
-      <button id="copy-btn" class="copy-btn" style="display:none;">📋 Copy</button>
-      <button id="whatsapp-btn" class="wa-btn" style="display:none;">📲 WhatsApp</button>
-      <button id="pdf-btn" class="pdf-btn" style="display:none;">📄 Download PDF</button>
-    </div>
+   <!-- Action buttons (hidden by default) -->
+<div class="actions" id="actions" style="display: none;">
+  <button id="copy-btn" class="copy-btn">
+    <i class="fas fa-copy"></i> Copy
+  </button>
+  <button id="whatsapp-btn" class="whatsapp-btn">
+    <i class="fab fa-whatsapp"></i> WhatsApp
+  </button>
+  <button id="pdf-btn" class="pdf-btn">
+    <i class="fas fa-file-pdf"></i> Download PDF
+  </button>
+</div>
+
   </div>
 
   <!-- Background Slideshow -->
@@ -258,6 +291,10 @@
 
         const data = await resp.json();
         outputBox.textContent = data.output || data.error;
+        // Show buttons only if we have output
+        if (data.output && data.output.trim() !== "") {
+        document.getElementById("actions").style.display = "flex";
+}
 
         if (data.output) {
           copyBtn.style.display = "inline-block";
@@ -329,6 +366,7 @@ pdfBtn.addEventListener("click", () => {
     ];
 
     const storyContainer = document.getElementById('storyContainer');
+    console.log("storyContainer:", storyContainer);
     artisans.forEach((artisan, index) => {
       const card = document.createElement('div');
       card.className = 'story-card';
@@ -371,6 +409,60 @@ pdfBtn.addEventListener("click", () => {
 
     closeBtn.onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
+    //speech
+ const micIcons = document.querySelectorAll(".mic-icon");
+const micStatus = document.getElementById("mic-status");
+const languageSelect = document.getElementById("language");
+
+if ("webkitSpeechRecognition" in window) {
+  const recognition = new webkitSpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  let activeTarget = null;
+
+  micIcons.forEach((icon) => {
+    const targetField = document.getElementById(icon.dataset.target);
+
+    icon.addEventListener("click", () => {
+      activeTarget = targetField;
+      recognition.lang =
+        languageSelect.value === "Hindi" ? "hi-IN" :
+        languageSelect.value === "Bengali" ? "bn-IN" :
+        languageSelect.value === "Tamil" ? "ta-IN" :
+        languageSelect.value === "Telugu" ? "te-IN" :
+        languageSelect.value === "Marathi" ? "mr-IN" : "en-IN";
+
+      recognition.start();
+      micStatus.textContent = `🎙️ Listening for ${icon.dataset.target}...`;
+      icon.style.color = "red"; // show active recording
+    });
+  });
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    if (activeTarget) {
+      if (activeTarget.tagName.toLowerCase() === "textarea") {
+        activeTarget.value += (activeTarget.value ? " " : "") + transcript;
+      } else {
+        activeTarget.value = transcript;
+      }
+    }
+    micStatus.textContent = "✅ Added text";
+  };
+
+  recognition.onend = () => {
+    micIcons.forEach((icon) => (icon.style.color = "#999")); // reset color
+    setTimeout(() => (micStatus.textContent = ""), 2000);
+  };
+
+  recognition.onerror = (event) => {
+    micStatus.textContent = "❌ Error: " + event.error;
+  };
+} else {
+  micStatus.textContent = "⚠️ Speech recognition not supported in this browser.";
+}
+
   </script>
 </body>
 </html>
