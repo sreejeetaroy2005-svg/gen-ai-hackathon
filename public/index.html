@@ -11,6 +11,12 @@
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
 />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 
   <style>
     /* Heading font: classic, elegant serif*/ 
@@ -173,8 +179,7 @@
   <textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
   <span class="mic-icon" data-target="notes">🎤</span>
 </div>
-
-
+<p id="mic-status" style="color: #007bff; font-weight: 600;"></p>
 
 
 
@@ -212,6 +217,13 @@
     <i class="fas fa-file-pdf"></i> Download PDF
   </button>
 </div>
+<h2>Nearby Markets & Shops</h2>
+<label for="locationInput">Enter Location:</label>
+<input type="text" id="locationInput" placeholder="e.g., Jaipur, Rajasthan" style="width: 80%; padding: 8px; margin: 6px 0;" />
+<button type="button" id="findMarkets">Find Nearby Markets</button>
+<div id="marketResults" style="margin-top:10px; text-align:left;"></div>
+<div id="map" style="height: 300px; margin-top: 15px; border-radius: 10px;"></div>
+
 
   </div>
 
@@ -271,40 +283,108 @@
         imageStatus.style.display = "none";
       }
     });
+    //demo mock response
+    // --- Mock generator fallback (simple deterministic output for demo) ---
+function generateMockOutput(formData) {
+  const title = formData.get("title") || "Handmade Product";
+  const craft = formData.get("craft") || "traditional craft";
+  const materials = formData.get("materials") || "local materials";
+  const region = formData.get("region") || "India";
+  const notes = formData.get("notes") || "";
+  const language = formData.get("language") || "English";
 
-    // Form submit
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      outputBox.textContent = "⏳ Generating...";
+  // very simple templates (English only) — translators or AI can be added later
+  const shortDesc = `${title} is a beautiful piece of ${craft} made using ${materials} from ${region}.`;
+  const longDesc = `${shortDesc} ${notes ? notes + " " : ""}This item is crafted with care and carries the cultural heritage of ${region}. It is suitable for home decor and gifting.`;
+  const hashtags = ["#handmade", `#${craft.replace(/\s+/g, "")}`, `#${region}`].slice(0,5);
+  const price = "₹800 - ₹2500";
 
-      const formData = new FormData(form);
-      try {
-        const resp = await fetch("/api/generate", {
-          method: "POST",
-          body: formData,
-        });
+  // Return same structure your frontend expects: { output: "..." }.
+  // Keep the output as a readable block so copy/pdf works.
+  const combined = `**1) Product Title:** ${title}\n\n**2) Short Description:** ${shortDesc}\n\n**3) Long Description:** ${longDesc}\n\n**4) Marketing Hashtags:** ${hashtags.join(", ")}\n\n**5) Suggested Price Range in INR:** ${price}`;
 
-        if (!resp.ok) {
-          outputBox.textContent = "❌ Server error: " + (await resp.text());
-          return;
-        }
-
-        const data = await resp.json();
-        outputBox.textContent = data.output || data.error;
-        // Show buttons only if we have output
-        if (data.output && data.output.trim() !== "") {
-        document.getElementById("actions").style.display = "flex";
+  return { output: combined };
 }
 
-        if (data.output) {
-          copyBtn.style.display = "inline-block";
-          whatsappBtn.style.display = "inline-block";
-          pdfBtn.style.display = "inline-block";
-        }
-      } catch (err) {
-        outputBox.textContent = "❌ Network error: " + err.message;
-      }
+
+    // Form submit
+    // --- submit handler with network fallback + auto-save ---
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  outputBox.textContent = "⏳ Generating...";
+
+  const formData = new FormData(form);
+
+  // helper: deterministic mock fallback
+  function generateMockOutput(formData) {
+    const title = formData.get("title") || "Handmade Product";
+    const craft = formData.get("craft") || "traditional craft";
+    const materials = formData.get("materials") || "local materials";
+    const region = formData.get("region") || "India";
+    const notes = formData.get("notes") || "";
+    const shortDesc = `${title} is a beautiful piece of ${craft} made using ${materials} from ${region}.`;
+    const longDesc = `${shortDesc} ${notes ? notes + " " : ""}This item is crafted with care and carries the cultural heritage of ${region}.`;
+    const hashtags = ["#handmade", `#${craft.replace(/\s+/g, "")}`, `#${region}`].slice(0,5);
+    const price = "₹800 - ₹2500";
+    const combined = `**1) Product Title:** ${title}\n\n**2) Short Description:** ${shortDesc}\n\n**3) Long Description:** ${longDesc}\n\n**4) Marketing Hashtags:** ${hashtags.join(", ")}\n\n**5) Suggested Price Range in INR:** ${price}`;
+    return { output: combined };
+  }
+
+  // Attempt network call, fall back to mock on errors
+  let data = null;
+  try {
+    const resp = await fetch("/api/generate", {
+      method: "POST",
+      body: formData,
     });
+
+    if (!resp.ok) {
+      console.warn("Server returned non-OK. Using fallback. status:", resp.status);
+      data = generateMockOutput(formData);
+    } else {
+      try {
+        data = await resp.json();
+      } catch (parseErr) {
+        console.warn("Failed to parse server JSON; using fallback", parseErr);
+        data = generateMockOutput(formData);
+      }
+    }
+  } catch (netErr) {
+    console.warn("Network error calling API, using mock fallback", netErr);
+    data = generateMockOutput(formData);
+  }
+
+  // show result and reveal action buttons if we have output
+  outputBox.textContent = data.output || data.error || "No output.";
+  if (data.output && data.output.trim() !== "") {
+    document.getElementById("actions").style.display = "flex";
+    copyBtn.style.display = "inline-block";
+    whatsappBtn.style.display = "inline-block";
+    pdfBtn.style.display = "inline-block";
+  }
+
+  // Save to localStorage (simple)
+  try {
+    const thumb = document.getElementById("preview")?.src || null;
+    const prod = {
+      id: Date.now(),
+      title: formData.get("title") || "Untitled",
+      excerpt: (data.output || "").split("\n")[0].slice(0,120),
+      output: data.output,
+      thumbnail: thumb,
+      createdAt: new Date().toISOString()
+    };
+    const key = "heritage_products_v1";
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    existing.unshift(prod);
+    localStorage.setItem(key, JSON.stringify(existing));
+    // optional: re-render saved list if you implemented renderSavedProducts()
+    if (typeof renderSavedProducts === "function") renderSavedProducts();
+  } catch (saveErr) {
+    console.warn("Could not save product to localStorage:", saveErr);
+  }
+});
+
 
     // Copy
     copyBtn.addEventListener("click", () => {
@@ -462,7 +542,123 @@ if ("webkitSpeechRecognition" in window) {
 } else {
   micStatus.textContent = "⚠️ Speech recognition not supported in this browser.";
 }
+  // ===================== Nearby Markets Finder =====================
+  let map;
+  let markersLayer;
 
+  async function findMarkets() {
+    console.log("✅ Button clicked, running findMarkets()");
+    const marketResults = document.getElementById("marketResults");
+    const locationInput = document.getElementById("locationInput").value.trim();
+    marketResults.innerHTML = "⏳ Finding markets...";
+
+    let lat, lon;
+
+    // 1) If user typed a location → use Nominatim
+    if (locationInput) {
+      try {
+        const geoResp = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`,
+          {
+            headers: {
+              "User-Agent": "HeritageHandsApp/1.0 (demo@example.com)",
+              "Accept-Language": "en",
+            },
+          }
+        );
+        const geoData = await geoResp.json();
+
+        if (geoData.length === 0) {
+          marketResults.innerHTML = "❌ Location not found.";
+          return;
+        }
+
+        lat = parseFloat(geoData[0].lat);
+        lon = parseFloat(geoData[0].lon);
+      } catch (err) {
+        console.error("❌ Geocoding error:", err);
+        marketResults.innerHTML = "❌ Geocoding error: " + err.message;
+        return;
+      }
+    } else {
+      // 2) Otherwise → use device GPS
+      if (!navigator.geolocation) {
+        marketResults.innerHTML = "⚠️ Geolocation not supported.";
+        return;
+      }
+      const pos = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+      );
+      lat = pos.coords.latitude;
+      lon = pos.coords.longitude;
+    }
+
+    // Initialize or update map
+    if (!map) {
+      map = L.map("map").setView([lat, lon], 14);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+    } else {
+      map.setView([lat, lon], 14);
+      markersLayer.clearLayers();
+    }
+
+    // Add user location marker
+    L.marker([lat, lon]).addTo(markersLayer).bindPopup("📍 Selected Location");
+
+    // Overpass API query for craft shops & marketplaces
+    const query = `
+      [out:json];
+      (
+        node["shop"="craft"](around:2000,${lat},${lon});
+        node["amenity"="marketplace"](around:2000,${lat},${lon});
+      );
+      out;
+    `;
+    const url =
+      "https://overpass-api.de/api/interpreter?data=" +
+      encodeURIComponent(query);
+
+    try {
+      const resp = await fetch(url);
+      const data = await resp.json();
+
+      if (data.elements.length === 0) {
+        marketResults.innerHTML = "❌ No markets found nearby.";
+        return;
+      }
+
+      marketResults.innerHTML = "<ul>";
+      data.elements.forEach((el) => {
+        const name = el.tags.name || "Unnamed Market";
+        const lat = el.lat;
+        const lon = el.lon;
+
+        marketResults.innerHTML += `<li>📍 ${name} (${lat.toFixed(
+          4
+        )}, ${lon.toFixed(4)})</li>`;
+
+        L.marker([lat, lon])
+          .addTo(markersLayer)
+          .bindPopup(
+            `<b>${name}</b><br>📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`
+          );
+      });
+      marketResults.innerHTML += "</ul>";
+    } catch (err) {
+      console.error("❌ Overpass error:", err);
+      marketResults.innerHTML = "❌ Error fetching markets: " + err.message;
+    }
+  }
+
+  // Ensure DOM is loaded before attaching event
+  document.addEventListener("DOMContentLoaded", () => {
+    document
+      .getElementById("findMarkets")
+      .addEventListener("click", findMarkets);
+  });
   </script>
 </body>
 </html>
