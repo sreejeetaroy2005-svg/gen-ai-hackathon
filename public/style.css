@@ -367,3 +367,17 @@ display: block;
 .mic-icon:hover {
   color: #e74c3c;
 }
+.speak-btn {
+  background: #8e44ad; /* Purple */
+}
+.speak-btn:hover {
+  background: #732d91;
+  transform: translateY(-3px);
+}
+.stop-btn {
+  background: #e67e22; /* Orange */
+}
+.stop-btn:hover {
+  background: #ca6f1e;
+  transform: translateY(-3px);
+}

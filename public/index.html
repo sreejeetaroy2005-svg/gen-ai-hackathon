@@ -216,6 +216,14 @@
   <button id="pdf-btn" class="pdf-btn">
     <i class="fas fa-file-pdf"></i> Download PDF
   </button>
+  <button id="speak-btn" class="speak-btn">
+  <i class="fas fa-volume-up"></i> Listen
+</button>
+<button id="stop-btn" class="stop-btn">
+  <i class="fas fa-stop"></i> Stop
+</button>
+
+
 </div>
 <h2>Nearby Markets & Shops</h2>
 <label for="locationInput">Enter Location:</label>
@@ -412,6 +420,42 @@ pdfBtn.addEventListener("click", () => {
   doc.text(lines, 15, 20);
   doc.save("artisan-product.pdf");
 });
+
+// ===================== Text-to-Speech =====================
+const speakBtn = document.getElementById("speak-btn");
+const stopBtn = document.getElementById("stop-btn");
+
+speakBtn.addEventListener("click", () => {
+  const text = outputBox.textContent.trim();
+  if (!text) {
+    alert("No text to read!");
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // Detect selected language
+  const lang = document.getElementById("language").value;
+  if (lang === "Hindi") utterance.lang = "hi-IN";
+  else if (lang === "Bengali") utterance.lang = "bn-IN";
+  else if (lang === "Tamil") utterance.lang = "ta-IN";
+  else if (lang === "Telugu") utterance.lang = "te-IN";
+  else if (lang === "Marathi") utterance.lang = "mr-IN";
+  else utterance.lang = "en-IN"; // default English
+
+  utterance.rate = 1;   // speed
+  utterance.pitch = 1;  // pitch
+
+  // Cancel any ongoing speech and start fresh
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+});
+
+// Stop speech
+stopBtn.addEventListener("click", () => {
+  window.speechSynthesis.cancel();
+});
+
 
     // Slideshow
     const slides = document.querySelectorAll(".slideshow img");
@@ -629,24 +673,44 @@ if ("webkitSpeechRecognition" in window) {
         marketResults.innerHTML = "❌ No markets found nearby.";
         return;
       }
+    marketResults.innerHTML = "<ul>";
+data.elements.forEach((el) => {
+  const name = el.tags.name || "Unnamed Market";
+  const lat = el.lat;
+  const lon = el.lon;
 
-      marketResults.innerHTML = "<ul>";
-      data.elements.forEach((el) => {
-        const name = el.tags.name || "Unnamed Market";
-        const lat = el.lat;
-        const lon = el.lon;
+  // Create marker
+  L.marker([lat, lon])
+    .addTo(markersLayer)
+    .bindPopup(`<b>${name}</b><br>📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`);
 
-        marketResults.innerHTML += `<li>📍 ${name} (${lat.toFixed(
-          4
-        )}, ${lon.toFixed(4)})</li>`;
+  // Create list item
+  const listItem = document.createElement("li");
 
-        L.marker([lat, lon])
-          .addTo(markersLayer)
-          .bindPopup(
-            `<b>${name}</b><br>📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`
-          );
-      });
-      marketResults.innerHTML += "</ul>";
+  // Link: open in Google Maps
+  const viewLink = document.createElement("a");
+  viewLink.href = `https://www.google.com/maps?q=${lat},${lon}`;
+  viewLink.target = "_blank";
+  viewLink.textContent = `📍 ${name}`;
+  viewLink.style.marginRight = "10px";
+
+  // Link: directions
+  const directionsLink = document.createElement("a");
+  directionsLink.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  directionsLink.target = "_blank";
+  directionsLink.textContent = "Directions";
+
+  // Add links into list item
+  listItem.appendChild(viewLink);
+  listItem.appendChild(directionsLink);
+
+  // Append to list
+  marketResults.querySelector("ul").appendChild(listItem);
+});
+marketResults.innerHTML += "</ul>";
+
+
+      
     } catch (err) {
       console.error("❌ Overpass error:", err);
       marketResults.innerHTML = "❌ Error fetching markets: " + err.message;
