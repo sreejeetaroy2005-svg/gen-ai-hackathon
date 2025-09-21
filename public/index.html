@@ -5,7 +5,6 @@
    
   <meta charset="utf-8" />
     <title>AI Marketplace Assistant</title>
-   
   <link rel="stylesheet" href="style.css" />
    
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -249,8 +248,10 @@
         return { output: combined };
       }
 
+
+
       // Attempting network call, fall back to mock on errors
-      let data = null;
+      /*let data = null;
       try {
         const resp = await fetch("/api/generate", {
           method: "POST",
@@ -271,7 +272,37 @@
       } catch (netErr) {
         console.warn("Network error calling API, using mock fallback", netErr);
         data = generateMockOutput(formData);
+      }*/
+      let data = null;
+
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  // Only try real API when running locally
+  try {
+    const resp = await fetch("/api/generate", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!resp.ok) {
+      console.warn("Server returned non-OK. Using fallback. status:", resp.status);
+      data = generateMockOutput(formData);
+    } else {
+      try {
+        data = await resp.json();
+      } catch (parseErr) {
+        console.warn("Failed to parse server JSON; using fallback", parseErr);
+        data = generateMockOutput(formData);
       }
+    }
+  } catch (netErr) {
+    console.warn("Network error calling API, using mock fallback", netErr);
+    data = generateMockOutput(formData);
+  }
+} else {
+  // On Firebase Hosting (no backend), always use mock output
+  data = generateMockOutput(formData);
+}
+
 
       // show result and reveal action buttons if we have output
       outputBox.textContent = data.output || data.error || "No output.";

@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "gen-ai-hackathon-bbf85"
-  }
+    "default": "heritage-hands",
+    "hh": "heritage-hands"
+  },
+  "targets": {},
+  "etags": {}
 }

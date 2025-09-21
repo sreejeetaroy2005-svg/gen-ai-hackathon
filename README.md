@@ -28,3 +28,6 @@ Multi-language marketplace interface.
 Secure login system (artisan/buyer accounts).
 
 Payment integration for direct craft sales.
+
+
+[“AI generation uses a mock fallback on the hosted version due to API key restrictions. Full AI generation works locally with Node.js backend.”]
