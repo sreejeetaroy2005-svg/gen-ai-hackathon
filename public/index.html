@@ -1,269 +1,216 @@
 <!doctype html>
 <html lang="en">
+
 <head>
+   
   <meta charset="utf-8" />
-  <title>AI Marketplace Assistant</title>
+    <title>AI Marketplace Assistant</title>
+   
   <link rel="stylesheet" href="style.css" />
- <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet">
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+   
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet">
+  <link   rel="stylesheet"   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link   rel="stylesheet"   href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 
-  <style>
-    /* Heading font: classic, elegant serif*/ 
-    h1
-    {
-      font-weight: bold;
-      text-align: center;
-      color: beige;
-    }
-
-    /* Body, inputs, textarea, select, buttons */
-    body, input, textarea, select, button {
-      font-family: Arial, Helvetica, sans-serif;
-      font-weight: normal;
-    }
-
-    /* Optional accent font */
-    .button, h3 {
-      font-family: 'Courier New', Courier, monospace;
-    }
-
-    /* Story Cards */
-    .story-list {
-      padding: 30px;
-      background: #fafafa;
-    }
-
-    #storyContainer {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-
-    .story-card {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      width: 220px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .story-card:hover {
-      transform: scale(1.05);
-    }
-
-    .story-card img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-bottom: 10px;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      background: rgba(0,0,0,0.6);
-    }
-
-    .modal-content {
-      background: #fff;
-      margin: 50px auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 600px;
-    }
-
-    .modal-content img {
-      display: block;
-      margin: 0 auto;
-    }
-
-    .close {
-      float: right;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    /* Product Grid */
-    .product-grid {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .product-grid div {
-      flex: 1 1 45%;
-      text-align: center;
-    }
-
-    .product-grid img {
-      max-width: 100%;
-      border-radius: 5px;
-    }
-
-    /* Slideshow */
-    .slideshow {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-      overflow: hidden;
-    }
-
-    .slideshow img {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 1s;
-    }
-
-    .slideshow img.active {
-      opacity: 1;
-    }
-  </style>
+   
+   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
+
 <body>
-  <div class="container">
-    <h1>Heritage Hands</h1>
-    <h2>Celebrating Crafts; Connecting Artisans</h2>
-      <form id="form" enctype="multipart/form-data">
-    <div class="input-wrapper">
-  <input placeholder="Product Title" id="title" name="title" />
-  <span class="mic-icon" data-target="title">🎤</span>
-</div>
+    <div class="container">
+        <h1>Heritage Hands</h1>
+        <h2>Celebrating Crafts; Connecting Artisans</h2>
+          <form id="form" enctype="multipart/form-data">
+          <div class="input-wrapper">
+          <input placeholder="Product Title" id="title" name="title" />
+          <span class="mic-icon" data-target="title">🎤</span>
+      </div>
 
-<div class="input-wrapper">
-  <input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
-  <span class="mic-icon" data-target="craft">🎤</span>
-</div>
+      <div class="input-wrapper">
+          <input placeholder="Craft (e.g., weaving, pottery)" id="craft" name="craft" />
+          <span class="mic-icon" data-target="craft">🎤</span>
+      </div>
 
-<div class="input-wrapper">
-  <input placeholder="Materials" id="materials" name="materials" />
-  <span class="mic-icon" data-target="materials">🎤</span>
-</div>
+      <div class="input-wrapper">
+          <input placeholder="Materials" id="materials" name="materials" />
+          <span class="mic-icon" data-target="materials">🎤</span>
+      </div>
 
-<div class="input-wrapper">
-  <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
-  <span class="mic-icon" data-target="region">🎤</span>
-</div>
+      <div class="input-wrapper">
+          <input placeholder="Region (e.g., Odisha, Rajasthan)" id="region" name="region" />
+          <span class="mic-icon" data-target="region">🎤</span>
+      </div>
 
-<div class="input-wrapper">
-  <textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
-  <span class="mic-icon" data-target="notes">🎤</span>
-</div>
-<p id="mic-status" style="color: #007bff; font-weight: 600;"></p>
+      <div class="input-wrapper">
+          <textarea placeholder="Extra Notes" id="notes" name="notes"></textarea>
+          <span class="mic-icon" data-target="notes">🎤</span>
+      </div>
+      <p id="mic-status" style="color: #007bff; font-weight: 600;"></p>
 
 
 
-      
-      <label for="language">Output Language:</label>
-      <select id="language" name="language">
-        <option value="English" selected>English</option>
-        <option value="Hindi">Hindi</option>
-        <option value="Bengali">Bengali</option>
-        <option value="Tamil">Tamil</option>
-        <option value="Telugu">Telugu</option>
-        <option value="Marathi">Marathi</option>
-      </select>
+           
+            <label for="language">Output Language:</label>
+            <select id="language" name="language">
+                <option value="English" selected>English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Tamil">Tamil</option>
+                <option value="Telugu">Telugu</option>
+                <option value="Marathi">Marathi</option>
+              </select>
 
-      <label for="image">Upload Product Image:</label>
-      <input type="file" id="image" name="image" accept="image/*" />
-      <img id="preview" style="max-width:200px; margin-top:10px; display:none;" />
-      <p id="image-status" style="display:none; color: #007bff; font-weight: 600;"></p>
+            <label for="image">Upload Product Image:</label>
+            <input type="file" id="image" name="image" accept="image" />
+            <img id="preview" style="max-width:200px; margin-top:10px; display:none;" />
+            <p id="image-status" style="display:none; color: #007bff; font-weight: 600;"></p>
 
-      <button type="submit">🚀 Generate Content</button>
+            <button type="submit">🚀 Generate Content</button>
+         
     </form>
 
-    <h2>AI Output:</h2>
-    <div id="output-box"></div>
+        <h2>AI Output:</h2>
+        <div id="output-box"></div>
 
-   <!-- Action buttons (hidden by default) -->
-<div class="actions" id="actions" style="display: none;">
-  <button id="copy-btn" class="copy-btn">
-    <i class="fas fa-copy"></i> Copy
-  </button>
-  <button id="whatsapp-btn" class="whatsapp-btn">
-    <i class="fab fa-whatsapp"></i> WhatsApp
-  </button>
-  <button id="pdf-btn" class="pdf-btn">
-    <i class="fas fa-file-pdf"></i> Download PDF
-  </button>
-  <button id="speak-btn" class="speak-btn">
-  <i class="fas fa-volume-up"></i> Listen
-</button>
-<button id="stop-btn" class="stop-btn">
-  <i class="fas fa-stop"></i> Stop
-</button>
-
-
-</div>
-<h2>Nearby Markets & Shops</h2>
-<label for="locationInput">Enter Location:</label>
-<input type="text" id="locationInput" placeholder="e.g., Jaipur, Rajasthan" style="width: 80%; padding: 8px; margin: 6px 0;" />
-<button type="button" id="findMarkets">Find Nearby Markets</button>
-<div id="marketResults" style="margin-top:10px; text-align:left;"></div>
-<div id="map" style="height: 300px; margin-top: 15px; border-radius: 10px;"></div>
+       <div class="actions" id="actions" style="display: none;">
+        <button id="copy-btn" class="copy-btn">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        <button id="whatsapp-btn" class="whatsapp-btn">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+          </button>
+        <button id="pdf-btn" class="pdf-btn">
+            <i class="fas fa-file-pdf"></i> Download PDF
+          </button>
+        <button id="speak-btn" class="speak-btn">
+          <i class="fas fa-volume-up"></i> Listen
+      </button>
+      <button id="stop-btn" class="stop-btn">
+          <i class="fas fa-stop"></i> Stop
+      </button>
 
 
-  </div>
-
-  <!-- Background Slideshow -->
-  <div class="slideshow">
-    <img src="bg1.jpg" class="active" />
-    <img src="bg2.jpg" />
-    <img src="bg3.jpg" />
-    <img src="bg4.jpg" />
-    <img src="bg5.jpg" />
-  </div>
-
-  <!-- Artisan Stories Section -->
-  <section class="story-list">
-    <h2>Stories of Our Artisans</h2>
-    <div id="storyContainer"></div>
-  </section>
-
-  <!-- Modal -->
-  <div id="storyModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h3 id="modalName"></h3>
-      <img id="modalImage" src="" alt="">
-      <p id="modalStory"></p>
-      <h4>Products:</h4>
-      <div id="modalProducts" class="product-grid"></div>
-      <p id="modalRegion"></p>
     </div>
+    <h2>Nearby Markets & Shops</h2>
+    <label for="locationInput">Enter Location:</label>
+    <input type="text" id="locationInput" placeholder="e.g., Jaipur, Rajasthan"
+      style="width: 80%; padding: 8px; margin: 6px 0;" />
+    <button type="button" id="findMarkets">Find Nearby Markets</button>
+    <div id="marketResults" style="margin-top:5px; text-align:left;"></div>
+    <div id="map" style="height: 300px; margin-top: 5px; border-radius: 10px;"></div>
+
+    <h2>📌 Submit Your Story</h2>
+    <form id="artistForm" onsubmit="return false;">
+        <input type="text" id="artistName" placeholder="Your Name" required>
+        <input type="text" id="artistCraft" placeholder="Your Craft (e.g., weaving)" required>
+        <input type="text" id="artistRegion" placeholder="Your Region" required>
+        <input type="tel" id="artistContact" placeholder="Your Contact Number (optional)">
+      <textarea id="artistStory" placeholder="Your Story" required></textarea>
+        <input type="file" id="artistImage" accept="image" required>
+        <button type="submit">Submit Story</button>
+    </form>
+    <h2>Featured Artisans</h2>
+    <div id="scrollingStories" class="scroll-container"></div>
+
+
+
+     
   </div>
 
-  <script>
+      <div class="slideshow">
+        <img src="bg1.jpg" class="active" />
+        <img src="bg2.jpg" />
+        <img src="bg3.jpg" />
+        <img src="bg4.jpg" />
+        <img src="bg5.jpg" />
+      </div>
+
+
+      <div id="storyModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h3 id="modalName"></h3>
+            <img id="modalImage" src="" alt="">
+            <p id="modalStory"></p>
+            <h4>Products:</h4>
+            <div id="modalProducts" class="product-grid"></div>
+            <p id="modalRegion"></p>
+          </div>
+      </div>
+
+   
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // ADDED: Firebase Storage imports,
+    import { getStorage, uploadBytes, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    import { getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { ref } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+
+    //Firebase config (get from Firebase Console → Project Settings)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8xtZJGt6ktTmJOnRnannccmiViNDDex0",
+      authDomain: "gen-ai-hackathon-bbf85.firebaseapp.com",
+      projectId: "gen-ai-hackathon-bbf85",
+      storageBucket: "gen-ai-hackathon-bbf85.appspot.com",
+      messagingSenderId: "1051218569357",
+      appId: "1:1051218569357:web:63518d20a4e2dcabc45ac4",
+      measurementId: "G-DZBHDT3710"
+    };
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    //emulator
+    import { connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { connectStorageEmulator } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      connectFirestoreEmulator(db, "localhost", 8282);
+      connectStorageEmulator(storage, "localhost", 9399);
+      console.log("✅ Connected to local Firestore and Storage emulators");
+    }
+
+    /*testemulator
+    async function testUpload() {
+      try {
+        const testRef = ref(storage, 'test.txt');
+        await uploadBytes(testRef, new Blob(["Hello emulator"]));
+        const url = await getDownloadURL(testRef);
+        console.log("✅ Test file uploaded:", url);
+      } catch (err) {
+        console.error("❌ Upload failed:", err);
+      }
+    }
+    
+    testUpload();
+    
+    /*async function testStorageEmulator() {
+      try {
+        const testRef = ref(storage, 'test.txt');
+        await uploadBytes(testRef, new Blob(["Hello emulator"]));
+        const url = await getDownloadURL(testRef);
+        console.log("✅ Storage emulator upload works. Download URL:", url);
+      } catch (err) {
+        console.error("❌ Storage emulator test failed:", err);
+      }
+    }
+    
+    testStorageEmulator();*/
+
+
+
+
     const form = document.getElementById("form");
     const outputBox = document.getElementById("output-box");
     const imageInput = document.getElementById("image");
@@ -291,107 +238,83 @@
         imageStatus.style.display = "none";
       }
     });
-    //demo mock response
-    // --- Mock generator fallback (simple deterministic output for demo) ---
-function generateMockOutput(formData) {
-  const title = formData.get("title") || "Handmade Product";
-  const craft = formData.get("craft") || "traditional craft";
-  const materials = formData.get("materials") || "local materials";
-  const region = formData.get("region") || "India";
-  const notes = formData.get("notes") || "";
-  const language = formData.get("language") || "English";
-
-  // very simple templates (English only) — translators or AI can be added later
-  const shortDesc = `${title} is a beautiful piece of ${craft} made using ${materials} from ${region}.`;
-  const longDesc = `${shortDesc} ${notes ? notes + " " : ""}This item is crafted with care and carries the cultural heritage of ${region}. It is suitable for home decor and gifting.`;
-  const hashtags = ["#handmade", `#${craft.replace(/\s+/g, "")}`, `#${region}`].slice(0,5);
-  const price = "₹800 - ₹2500";
-
-  // Return same structure your frontend expects: { output: "..." }.
-  // Keep the output as a readable block so copy/pdf works.
-  const combined = `**1) Product Title:** ${title}\n\n**2) Short Description:** ${shortDesc}\n\n**3) Long Description:** ${longDesc}\n\n**4) Marketing Hashtags:** ${hashtags.join(", ")}\n\n**5) Suggested Price Range in INR:** ${price}`;
-
-  return { output: combined };
-}
-
-
     // Form submit
     // --- submit handler with network fallback + auto-save ---
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  outputBox.textContent = "⏳ Generating...";
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      outputBox.textContent = "⏳ Generating...";
 
-  const formData = new FormData(form);
+      const formData = new FormData(form);
 
-  // helper: deterministic mock fallback
-  function generateMockOutput(formData) {
-    const title = formData.get("title") || "Handmade Product";
-    const craft = formData.get("craft") || "traditional craft";
-    const materials = formData.get("materials") || "local materials";
-    const region = formData.get("region") || "India";
-    const notes = formData.get("notes") || "";
-    const shortDesc = `${title} is a beautiful piece of ${craft} made using ${materials} from ${region}.`;
-    const longDesc = `${shortDesc} ${notes ? notes + " " : ""}This item is crafted with care and carries the cultural heritage of ${region}.`;
-    const hashtags = ["#handmade", `#${craft.replace(/\s+/g, "")}`, `#${region}`].slice(0,5);
-    const price = "₹800 - ₹2500";
-    const combined = `**1) Product Title:** ${title}\n\n**2) Short Description:** ${shortDesc}\n\n**3) Long Description:** ${longDesc}\n\n**4) Marketing Hashtags:** ${hashtags.join(", ")}\n\n**5) Suggested Price Range in INR:** ${price}`;
-    return { output: combined };
-  }
+      // helper: deterministic mock fallback
+      function generateMockOutput(formData) {
+        const title = formData.get("title") || "Handmade Product";
+        const craft = formData.get("craft") || "traditional craft";
+        const materials = formData.get("materials") || "local materials";
+        const region = formData.get("region") || "India";
+        const notes = formData.get("notes") || "";
+        const shortDesc = `${title} is a beautiful piece of ${craft} made using ${materials} from ${region}.`;
+        const longDesc = `${shortDesc} ${notes ? notes + " " : ""}This item is crafted with care and carries the cultural heritage of ${region}.`;
+        const hashtags = ["#handmade", `#${craft.replace(/\s+/g, "")}`, `#${region}`].slice(0, 5);
+        const price = "₹800 - ₹2500";
+        const combined = `**1) Product Title:** ${title}\n\n**2) Short Description:** ${shortDesc}\n\n**3) Long Description:** ${longDesc}\n\n**4) Marketing Hashtags:** ${hashtags.join(", ")}\n\n**5) Suggested Price Range in INR:** ${price}`;
+        return { output: combined };
+      }
 
-  // Attempt network call, fall back to mock on errors
-  let data = null;
-  try {
-    const resp = await fetch("/api/generate", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!resp.ok) {
-      console.warn("Server returned non-OK. Using fallback. status:", resp.status);
-      data = generateMockOutput(formData);
-    } else {
+      // Attempt network call, fall back to mock on errors
+      let data = null;
       try {
-        data = await resp.json();
-      } catch (parseErr) {
-        console.warn("Failed to parse server JSON; using fallback", parseErr);
+        const resp = await fetch("/api/generate", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!resp.ok) {
+          console.warn("Server returned non-OK. Using fallback. status:", resp.status);
+          data = generateMockOutput(formData);
+        } else {
+          try {
+            data = await resp.json();
+          } catch (parseErr) {
+            console.warn("Failed to parse server JSON; using fallback", parseErr);
+            data = generateMockOutput(formData);
+          }
+        }
+      } catch (netErr) {
+        console.warn("Network error calling API, using mock fallback", netErr);
         data = generateMockOutput(formData);
       }
-    }
-  } catch (netErr) {
-    console.warn("Network error calling API, using mock fallback", netErr);
-    data = generateMockOutput(formData);
-  }
 
-  // show result and reveal action buttons if we have output
-  outputBox.textContent = data.output || data.error || "No output.";
-  if (data.output && data.output.trim() !== "") {
-    document.getElementById("actions").style.display = "flex";
-    copyBtn.style.display = "inline-block";
-    whatsappBtn.style.display = "inline-block";
-    pdfBtn.style.display = "inline-block";
-  }
+      // show result and reveal action buttons if we have output
+      outputBox.textContent = data.output || data.error || "No output.";
+      if (data.output && data.output.trim() !== "") {
+        document.getElementById("actions").style.display = "flex";
+        copyBtn.style.display = "inline-block";
+        whatsappBtn.style.display = "inline-block";
+        pdfBtn.style.display = "inline-block";
+      }
 
-  // Save to localStorage (simple)
-  try {
-    const thumb = document.getElementById("preview")?.src || null;
-    const prod = {
-      id: Date.now(),
-      title: formData.get("title") || "Untitled",
-      excerpt: (data.output || "").split("\n")[0].slice(0,120),
-      output: data.output,
-      thumbnail: thumb,
-      createdAt: new Date().toISOString()
-    };
-    const key = "heritage_products_v1";
-    const existing = JSON.parse(localStorage.getItem(key) || "[]");
-    existing.unshift(prod);
-    localStorage.setItem(key, JSON.stringify(existing));
-    // optional: re-render saved list if you implemented renderSavedProducts()
-    if (typeof renderSavedProducts === "function") renderSavedProducts();
-  } catch (saveErr) {
-    console.warn("Could not save product to localStorage:", saveErr);
-  }
-});
+      // Save to localStorage (simple)
+      try {
+        const thumb = document.getElementById("preview")?.src || null;
+        const prod = {
+          id: Date.now(),
+          title: formData.get("title") || "Untitled",
+          excerpt: (data.output || "").split("\n")[0].slice(0, 120),
+          output: data.output,
+          thumbnail: thumb,
+          createdAt: new Date().toISOString()
+        };
+        const key = "heritage_products_v1";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        existing.unshift(prod);
+        localStorage.setItem(key, JSON.stringify(existing));
+        // optional: re-render saved list if you implemented renderSavedProducts()
+        if (typeof renderSavedProducts === "function") renderSavedProducts();
+      } catch (saveErr) {
+        console.warn("Could not save product to localStorage:", saveErr);
+      }
+    });
 
 
     // Copy
@@ -410,51 +333,51 @@ form.addEventListener("submit", async (e) => {
 
     // PDF Download
     // PDF Download
-pdfBtn.addEventListener("click", () => {
-  const { jsPDF } = window.jspdf; // get from the global namespace
-  const doc = new jsPDF();
-  doc.setFont("Helvetica", "normal");
-  doc.setFontSize(12);
-  const text = outputBox.textContent;
-  const lines = doc.splitTextToSize(text, 180);
-  doc.text(lines, 15, 20);
-  doc.save("artisan-product.pdf");
-});
+    pdfBtn.addEventListener("click", () => {
+      const { jsPDF } = window.jspdf; // get from the global namespace
+      const doc = new jsPDF();
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(12);
+      const text = outputBox.textContent;
+      const lines = doc.splitTextToSize(text, 180);
+      doc.text(lines, 15, 20);
+      doc.save("artisan-product.pdf");
+    });
 
-// ===================== Text-to-Speech =====================
-const speakBtn = document.getElementById("speak-btn");
-const stopBtn = document.getElementById("stop-btn");
+    // ===================== Text-to-Speech =====================
+    const speakBtn = document.getElementById("speak-btn");
+    const stopBtn = document.getElementById("stop-btn");
 
-speakBtn.addEventListener("click", () => {
-  const text = outputBox.textContent.trim();
-  if (!text) {
-    alert("No text to read!");
-    return;
-  }
+    speakBtn.addEventListener("click", () => {
+      const text = outputBox.textContent.trim();
+      if (!text) {
+        alert("No text to read!");
+        return;
+      }
 
-  const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(text);
 
-  // Detect selected language
-  const lang = document.getElementById("language").value;
-  if (lang === "Hindi") utterance.lang = "hi-IN";
-  else if (lang === "Bengali") utterance.lang = "bn-IN";
-  else if (lang === "Tamil") utterance.lang = "ta-IN";
-  else if (lang === "Telugu") utterance.lang = "te-IN";
-  else if (lang === "Marathi") utterance.lang = "mr-IN";
-  else utterance.lang = "en-IN"; // default English
+      // Detect selected language
+      const lang = document.getElementById("language").value;
+      if (lang === "Hindi") utterance.lang = "hi-IN";
+      else if (lang === "Bengali") utterance.lang = "bn-IN";
+      else if (lang === "Tamil") utterance.lang = "ta-IN";
+      else if (lang === "Telugu") utterance.lang = "te-IN";
+      else if (lang === "Marathi") utterance.lang = "mr-IN";
+      else utterance.lang = "en-IN"; // default English
 
-  utterance.rate = 1;   // speed
-  utterance.pitch = 1;  // pitch
+      utterance.rate = 1;   // speed
+      utterance.pitch = 1;  // pitch
 
-  // Cancel any ongoing speech and start fresh
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
-});
+      // Cancel any ongoing speech and start fresh
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    });
 
-// Stop speech
-stopBtn.addEventListener("click", () => {
-  window.speechSynthesis.cancel();
-});
+    // Stop speech
+    stopBtn.addEventListener("click", () => {
+      window.speechSynthesis.cancel();
+    });
 
 
     // Slideshow
@@ -466,263 +389,359 @@ stopBtn.addEventListener("click", () => {
       slides[index].classList.add("active");
     }, 5000);
 
-    // Artisan stories
-    const artisans = [
-      {
-        name: "Ravi Kumar",
-        story: "I learned pottery from my father in Odisha. My work reflects traditional techniques passed down through generations.",
-        products: [
-          {title: "Clay Vase", price: 1200, image: "vase.jpg"},
-          {title: "Decorative Bowl", price: 800, image: "bowl.jpg"}
-        ],
-        region: "Odisha",
-        profileImage: "ravi.png"
-      },
-      {
-        name: "Sita Devi",
-        story: "I create traditional handwoven textiles in Rajasthan. Each piece tells a story of heritage and craftsmanship.",
-        products: [
-          {title: "Handloom Scarf", price: 1500, image: "scarf.jpg"}
-        ],
-        region: "Rajasthan",
-        profileImage: "sita.png"
-      }
-    ];
 
-    const storyContainer = document.getElementById('storyContainer');
-    console.log("storyContainer:", storyContainer);
-    artisans.forEach((artisan, index) => {
-      const card = document.createElement('div');
-      card.className = 'story-card';
-      card.innerHTML = `
-        <img src="${artisan.profileImage}" alt="${artisan.name}">
-        <h4>${artisan.name}</h4>
-        <p>${artisan.story.substring(0, 100)}...</p>
-        <small>Region: ${artisan.region}</small>
-      `;
-      card.addEventListener('click', () => openModal(index));
-      storyContainer.appendChild(card);
-    });
+    // ARTISAN STORIES SECTION 
 
-    const modal = document.getElementById('storyModal');
-    const closeBtn = modal.querySelector('.close');
+
+    const artistForm = document.getElementById("artistForm");
+    const scrollingStories = document.getElementById("scrollingStories");
+    const storyModal = document.getElementById('storyModal');
+    const closeBtn = storyModal.querySelector('.close');
     const modalName = document.getElementById('modalName');
     const modalImage = document.getElementById('modalImage');
     const modalStory = document.getElementById('modalStory');
-    const modalProducts = document.getElementById('modalProducts');
     const modalRegion = document.getElementById('modalRegion');
+    const modalProducts = document.getElementById('modalProducts');
 
-    function openModal(index) {
-      const artisan = artisans[index];
+    //submit story event handler
+    artistForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const feedback = document.createElement("p");
+  feedback.textContent = "Submitting your story, please wait...";
+  feedback.style.color = "#007bff";
+  artistForm.appendChild(feedback);
+
+  const submitButton = artistForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+
+  const name = document.getElementById("artistName").value;
+  const craft = document.getElementById("artistCraft").value;
+  const region = document.getElementById("artistRegion").value;
+  const story = document.getElementById("artistStory").value;
+  const contact = document.getElementById("artistContact").value;
+
+  // 🔹 Always use the same default image
+  const defaultImage = "placeholder.jpg"; // make sure this file exists in /public
+
+  try {
+    await addDoc(collection(db, "artisans"), {
+      name,
+      craft,
+      region,
+      story,
+      contact: contact || "",
+      profileImage: defaultImage,
+      timestamp: new Date()
+    });
+
+    feedback.textContent = "✅ Story submitted successfully!";
+    artistForm.reset();
+    await loadStories();
+    submitButton.disabled = false;
+
+  } catch (err) {
+    console.error("Error submitting story: ", err);
+    feedback.textContent = "❌ An error occurred. Please check the console.";
+    submitButton.disabled = false;
+  }
+
+  return false;
+});
+
+    async function loadStories() {
+      const querySnapshot = await getDocs(collection(db, "artisans"));
+      scrollingStories.innerHTML = "";
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        // Create card
+        const card = document.createElement("div");
+        card.className = "story-card";
+
+        // Short preview of the story
+        const storyPreview = data.story.length > 100 ? data.story.substring(0, 100) + "..." : data.story;
+
+        card.innerHTML = `
+      <img src="${data.profileImage || 'placeholder.jpg'}" alt="${data.name}">
+      <h4>${data.name}</h4>
+      <p><strong>${data.craft}</strong> - ${data.region}</p>
+      <p>${storyPreview}</p>
+    `;
+
+        // Make the card clickable to open modal
+        card.style.cursor = "pointer";
+        card.addEventListener("click", () => openModal(doc.id));
+
+        // Append to scrolling container
+        scrollingStories.appendChild(card);
+      });
+    }
+
+
+    async function openModal(artisanId) {
+      const querySnapshot = await getDocs(collection(db, "artisans"));
+      const artisanDoc = querySnapshot.docs.find(d => d.id === artisanId);
+      if (!artisanDoc) return;
+
+      const artisan = artisanDoc.data();
+
+      // Fill modal
       modalName.textContent = artisan.name;
       modalImage.src = artisan.profileImage;
-      modalStory.textContent = artisan.story;
+      modalStory.textContent = artisan.story; // full story
       modalRegion.textContent = `Region: ${artisan.region}`;
-      modalProducts.innerHTML = '';
-      artisan.products.forEach(prod => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <img src="${prod.image}">
-          <p>${prod.title}</p>
-          <p>₹${prod.price}</p>
-        `;
-        modalProducts.appendChild(div);
-      });
-      modal.style.display = 'block';
-    }
 
-    closeBtn.onclick = () => modal.style.display = 'none';
-    window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
-    //speech
- const micIcons = document.querySelectorAll(".mic-icon");
-const micStatus = document.getElementById("mic-status");
-const languageSelect = document.getElementById("language");
-
-if ("webkitSpeechRecognition" in window) {
-  const recognition = new webkitSpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-
-  let activeTarget = null;
-
-  micIcons.forEach((icon) => {
-    const targetField = document.getElementById(icon.dataset.target);
-
-    icon.addEventListener("click", () => {
-      activeTarget = targetField;
-      recognition.lang =
-        languageSelect.value === "Hindi" ? "hi-IN" :
-        languageSelect.value === "Bengali" ? "bn-IN" :
-        languageSelect.value === "Tamil" ? "ta-IN" :
-        languageSelect.value === "Telugu" ? "te-IN" :
-        languageSelect.value === "Marathi" ? "mr-IN" : "en-IN";
-
-      recognition.start();
-      micStatus.textContent = `🎙️ Listening for ${icon.dataset.target}...`;
-      icon.style.color = "red"; // show active recording
-    });
-  });
-
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    if (activeTarget) {
-      if (activeTarget.tagName.toLowerCase() === "textarea") {
-        activeTarget.value += (activeTarget.value ? " " : "") + transcript;
+      // Optional: display products (if stored in Firestore)
+      modalProducts.innerHTML = "";
+      if (artisan.products && artisan.products.length > 0) {
+        artisan.products.forEach(prod => {
+          const prodDiv = document.createElement("div");
+          prodDiv.innerHTML = `
+        <img src="${prod.image}" alt="${prod.title}">
+        <p>${prod.title}</p>
+      `;
+          modalProducts.appendChild(prodDiv);
+        });
       } else {
-        activeTarget.value = transcript;
+        modalProducts.innerHTML = `<p>No products listed yet.</p>`;
       }
+
+      // Optional: contact info (if stored)
+      if (artisan.contact) {
+        const contactEl = document.createElement("p");
+        contactEl.innerHTML = `Contact:<a href="mailto:${artisan.contact}">${artisan.contact}</a>`;
+        modalProducts.appendChild(contactEl);
+      }
+
+      storyModal.style.display = "block";
     }
-    micStatus.textContent = "✅ Added text";
-  };
 
-  recognition.onend = () => {
-    micIcons.forEach((icon) => (icon.style.color = "#999")); // reset color
-    setTimeout(() => (micStatus.textContent = ""), 2000);
-  };
+    closeBtn.onclick = () => storyModal.style.display = "none";
+    window.onclick = (e) => { if (e.target === storyModal) storyModal.style.display = "none"; };
 
-  recognition.onerror = (event) => {
-    micStatus.textContent = "❌ Error: " + event.error;
-  };
-} else {
-  micStatus.textContent = "⚠️ Speech recognition not supported in this browser.";
-}
-  // ===================== Nearby Markets Finder =====================
-  let map;
-  let markersLayer;
+    // END: CORRECTED ARTISAN STORIES SECTION ---
 
-  async function findMarkets() {
-    console.log("✅ Button clicked, running findMarkets()");
-    const marketResults = document.getElementById("marketResults");
-    const locationInput = document.getElementById("locationInput").value.trim();
-    marketResults.innerHTML = "⏳ Finding markets...";
+    //speech
+    const micIcons = document.querySelectorAll(".mic-icon");
+    const micStatus = document.getElementById("mic-status");
+    const languageSelect = document.getElementById("language");
 
-    let lat, lon;
+    if ("webkitSpeechRecognition" in window) {
+      const recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
 
-    // 1) If user typed a location → use Nominatim
-    if (locationInput) {
-      try {
-        const geoResp = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`,
-          {
-            headers: {
-              "User-Agent": "HeritageHandsApp/1.0 (demo@example.com)",
-              "Accept-Language": "en",
-            },
+      let activeTarget = null;
+
+      micIcons.forEach((icon) => {
+        const targetField = document.getElementById(icon.dataset.target);
+
+        icon.addEventListener("click", () => {
+          activeTarget = targetField;
+          recognition.lang =
+            languageSelect.value === "Hindi" ? "hi-IN" :
+              languageSelect.value === "Bengali" ? "bn-IN" :
+                languageSelect.value === "Tamil" ? "ta-IN" :
+                  languageSelect.value === "Telugu" ? "te-IN" :
+                    languageSelect.value === "Marathi" ? "mr-IN" : "en-IN";
+
+          recognition.start();
+          micStatus.textContent = `🎙️ Listening for ${icon.dataset.target}...`;
+          icon.style.color = "red"; // show active recording
+        });
+      });
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (activeTarget) {
+          if (activeTarget.tagName.toLowerCase() === "textarea") {
+            activeTarget.value += (activeTarget.value ? " " : "") + transcript;
+          } else {
+            activeTarget.value = transcript;
           }
-        );
-        const geoData = await geoResp.json();
+        }
+        micStatus.textContent = "✅ Added text";
+      };
 
-        if (geoData.length === 0) {
-          marketResults.innerHTML = "❌ Location not found.";
+      recognition.onend = () => {
+        micIcons.forEach((icon) => (icon.style.color = "#999")); // reset color
+        setTimeout(() => (micStatus.textContent = ""), 2000);
+      };
+
+      recognition.onerror = (event) => {
+        micStatus.textContent = "❌ Error: " + event.error;
+      };
+    } else {
+      micStatus.textContent = "⚠️ Speech recognition not supported in this browser.";
+    }
+    //nearby Markets Finder
+    let map;
+    let markersLayer;
+
+    async function findMarkets() {
+      console.log("✅ Button clicked, running findMarkets()");
+      const marketResults = document.getElementById("marketResults");
+      const locationInput = document.getElementById("locationInput").value.trim();
+      marketResults.innerHTML = "⏳ Finding markets...";
+
+      let lat, lon;
+
+      // 1) If user typed a location → use Nominatim
+      if (locationInput) {
+        try {
+          const geoResp = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`,
+            {
+              headers: {
+                "User-Agent": "HeritageHandsApp/1.0 (demo@example.com)",
+                "Accept-Language": "en",
+              },
+            }
+          );
+          const geoData = await geoResp.json();
+
+          if (geoData.length === 0) {
+            marketResults.innerHTML = "❌ Location not found.";
+            return;
+          }
+
+          lat = parseFloat(geoData[0].lat);
+          lon = parseFloat(geoData[0].lon);
+        } catch (err) {
+          console.error("❌ Geocoding error:", err);
+          marketResults.innerHTML = "❌ Geocoding error: " + err.message;
+          return;
+        }
+      } else {
+        // 2) Otherwise → use device GPS
+        if (!navigator.geolocation) {
+          marketResults.innerHTML = "⚠️ Geolocation not supported.";
+          return;
+        }
+        const pos = await new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject)
+        );
+        lat = pos.coords.latitude;
+        lon = pos.coords.longitude;
+      }
+
+      // Initialize or update map
+      if (!map) {
+        map = L.map("map").setView([lat, lon], 14);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+        markersLayer = L.layerGroup().addTo(map);
+      } else {
+        map.setView([lat, lon], 14);
+        markersLayer.clearLayers();
+      }
+
+      // Add user location marker
+      L.marker([lat, lon]).addTo(markersLayer).bindPopup("📍 Selected Location");
+
+      // Overpass API query for craft shops & marketplaces
+      const query = `
+    [out:json];
+    (
+      node["shop"="craft"](around:2000,${lat},${lon});
+      node["amenity"="marketplace"](around:2000,${lat},${lon});
+    );
+    out;
+  `;
+
+      try {
+        // ✅ FIXED: POST request instead of GET
+        const resp = await fetch("https://overpass-api.de/api/interpreter", {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: query
+        });
+        const data = await resp.json();
+
+        if (data.elements.length === 0) {
+          marketResults.innerHTML = "❌ No markets found nearby.";
           return;
         }
 
-        lat = parseFloat(geoData[0].lat);
-        lon = parseFloat(geoData[0].lon);
+        marketResults.innerHTML = "<ul>";
+        data.elements.forEach((el) => {
+          const name = el.tags.name || "Unnamed Market";
+          const lat = el.lat;
+          const lon = el.lon;
+
+          // Create marker
+          L.marker([lat, lon])
+            .addTo(markersLayer)
+            .bindPopup(`<b>${name}</b><br>📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+
+          // Create list item
+          const listItem = document.createElement("li");
+
+          // Link: open in Google Maps
+          const viewLink = document.createElement("a");
+          viewLink.href = `https://www.google.com/maps?q=${lat},${lon}`;
+          viewLink.target = "_blank";
+          viewLink.textContent = `📍 ${name}`;
+          viewLink.style.marginRight = "10px";
+
+          // Link: directions
+          const directionsLink = document.createElement("a");
+          directionsLink.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+          directionsLink.target = "_blank";
+          directionsLink.textContent = "Directions";
+
+          // Add links into list item
+          listItem.appendChild(viewLink);
+          listItem.appendChild(directionsLink);
+
+          // Append to list
+          marketResults.querySelector("ul").appendChild(listItem);
+        });
+        marketResults.innerHTML += "</ul>";
+
       } catch (err) {
-        console.error("❌ Geocoding error:", err);
-        marketResults.innerHTML = "❌ Geocoding error: " + err.message;
-        return;
+        console.error("❌ Overpass error:", err);
+        marketResults.innerHTML = "❌ Error fetching markets: " + err.message;
       }
-    } else {
-      // 2) Otherwise → use device GPS
-      if (!navigator.geolocation) {
-        marketResults.innerHTML = "⚠️ Geolocation not supported.";
-        return;
-      }
-      const pos = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject)
-      );
-      lat = pos.coords.latitude;
-      lon = pos.coords.longitude;
     }
 
-    // Initialize or update map
-    if (!map) {
-      map = L.map("map").setView([lat, lon], 14);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap contributors",
-      }).addTo(map);
-      markersLayer = L.layerGroup().addTo(map);
-    } else {
-      map.setView([lat, lon], 14);
-      markersLayer.clearLayers();
-    }
+    // Ensure DOM is loaded before attaching event
+    document.addEventListener("DOMContentLoaded", () => {
+      document
+        .getElementById("findMarkets")
+        .addEventListener("click", findMarkets);
+    });
 
-    // Add user location marker
-    L.marker([lat, lon]).addTo(markersLayer).bindPopup("📍 Selected Location");
 
-    // Overpass API query for craft shops & marketplaces
-    const query = `
-      [out:json];
-      (
-        node["shop"="craft"](around:2000,${lat},${lon});
-        node["amenity"="marketplace"](around:2000,${lat},${lon});
-      );
-      out;
-    `;
-    const url =
-      "https://overpass-api.de/api/interpreter?data=" +
-      encodeURIComponent(query);
 
-    try {
-      const resp = await fetch(url);
-      const data = await resp.json();
 
-      if (data.elements.length === 0) {
-        marketResults.innerHTML = "❌ No markets found nearby.";
-        return;
+    // Load stories on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      loadStories();
+    });
+
+    // Close modal event listeners
+    closeBtn.onclick = () => storyModal.style.display = "none";
+    window.onclick = (e) => { if (e.target === storyModal) storyModal.style.display = "none"; };
+
+    /*testingdirestone
+    async function testFirestore() {
+      try {
+        const snapshot = await getDocs(collection(window.db, "artisans"));
+        snapshot.forEach(doc => {
+          console.log("Firestore doc:", doc.id, doc.data());
+        });
+      } catch (err) {
+        console.error("Firestore read error:", err);
       }
-    marketResults.innerHTML = "<ul>";
-data.elements.forEach((el) => {
-  const name = el.tags.name || "Unnamed Market";
-  const lat = el.lat;
-  const lon = el.lon;
-
-  // Create marker
-  L.marker([lat, lon])
-    .addTo(markersLayer)
-    .bindPopup(`<b>${name}</b><br>📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}`);
-
-  // Create list item
-  const listItem = document.createElement("li");
-
-  // Link: open in Google Maps
-  const viewLink = document.createElement("a");
-  viewLink.href = `https://www.google.com/maps?q=${lat},${lon}`;
-  viewLink.target = "_blank";
-  viewLink.textContent = `📍 ${name}`;
-  viewLink.style.marginRight = "10px";
-
-  // Link: directions
-  const directionsLink = document.createElement("a");
-  directionsLink.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-  directionsLink.target = "_blank";
-  directionsLink.textContent = "Directions";
-
-  // Add links into list item
-  listItem.appendChild(viewLink);
-  listItem.appendChild(directionsLink);
-
-  // Append to list
-  marketResults.querySelector("ul").appendChild(listItem);
-});
-marketResults.innerHTML += "</ul>";
-
-
-      
-    } catch (err) {
-      console.error("❌ Overpass error:", err);
-      marketResults.innerHTML = "❌ Error fetching markets: " + err.message;
     }
-  }
+    
+    testFirestore();*/
 
-  // Ensure DOM is loaded before attaching event
-  document.addEventListener("DOMContentLoaded", () => {
-    document
-      .getElementById("findMarkets")
-      .addEventListener("click", findMarkets);
-  });
   </script>
 </body>
+
 </html>
