@@ -1,0 +1,20 @@
+User (artisan) flow:
+
+1.Artisan uploads a product photo + short inputs (craft, materials, region, short notes).
+
+2.System extracts text (OCR) and analyzes the image (Vision) → produces tags.
+
+3.Vertex AI (Gemini) generates:
+
+4.Product title
+
+5.Long & short product descriptions
+
+6.Storytelling paragraph about craft & artisan
+
+7.Suggested hashtags / social post copy
+
+8.Suggested price range (basic heuristic)
+
+9.Artisan reviews & publishes to marketplace listing (or exports social post).
+That single flow covers core features: content generation, storytelling, multilingual reach, and faster listing creation.
