@@ -9,8 +9,18 @@
       "port": 8282
     },
     "hosting": {
-      "host": "localhost",
-      "port": 5500
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
     },
     "storage": {
       "host": "localhost",
