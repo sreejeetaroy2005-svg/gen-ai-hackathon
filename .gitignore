@@ -72,3 +72,5 @@ node_modules/
 .env
 .DS_Store
 "intro.text" 
+
+intro.text
