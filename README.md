@@ -1,10 +1,30 @@
-Offline/demo fallback:
-If the Vertex AI or server endpoint is unavailable (or billing isn't enabled), the frontend uses a deterministic mock generator so the app still demos fully. Generated items are saved locally in the browser (LocalStorage) under "My Products".
+#  Heritage Hands — Gen AI Hackathon Project
 
-ow your flow is:
+Heritage Hands is a web app built for the **Gen AI Hackathon** to empower local artisans and preserve traditional crafts.  
+It uses AI to generate multilingual content, connect artisans to nearby markets, and showcase products globally.  
 
-Artisan submits story → gets saved in Firestore
+## ✨ Features
+- 📝 AI-powered product description generator (multi-language support: Hindi, Bengali, Tamil, Telugu, Marathi, English, etc.)
+- 📷 Upload product images to enrich listings
+- 📍 Find nearby markets & shops
+- 📖 Submit artisan stories
+- 🌟 Featured artisans & product highlights
 
-Stories auto-load on every page refresh for all users.
+## 🚀 Live Demo
+🔗 [Heritage Hands on Firebase](https://gen-ai-hackathon-bbf85.web.app/)
 
-Fully backed by Google Cloud Database (Firestore), free tier, no credit card.
+## 🛠️ Tech Stack
+- Frontend:React (with Tailwind CSS)
+- Backend / Hosting:Firebase (Firestore, Storage, Authentication)
+- **AI / NLP: Generative AI APIs (e.g. Gemini )
+- Maps / Location: :Open streetMap AI
+
+📌 Future Scope
+
+Buyer Portal with wishlists and artisan search.
+
+Multi-language marketplace interface.
+
+Secure login system (artisan/buyer accounts).
+
+Payment integration for direct craft sales.
